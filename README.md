@@ -14,13 +14,11 @@ import { Pieper, type SafeResult } from "pieper";
 async function slugify(
   title: string | null | undefined
 ): Promise<SafeResult<string>> {
-  const pipe = Pieper.from(() => {
-    if (typeof title !== "string" || title.trim().length === 0) {
-      throw new Error("Input title cannot be empty");
-    }
-
-    return title;
-  })
+  const pipe = Pieper.of(title)
+    .assert(
+      (s): s is string => typeof s === "string" && s.trim().length !== 0,
+      "Input title cannot be empty"
+    )
     .log("1. Original:")
     .map((s) => s.toLowerCase())
     .map((s) => s.normalize("NFD"))
