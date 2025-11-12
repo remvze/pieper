@@ -74,10 +74,22 @@ export class Pieper<T> {
     return new Pieper(this.value.finally(fn));
   }
 
-  assert(
-    predicate: (value: T) => MaybePromise<boolean>,
+  assert<R extends T>(
+    predicate: (value: T) => value is R,
     errorMessageOrError: string | Error
-  ) {
+  ): Pieper<R>;
+
+  assert(
+    predicate: (value: T) => boolean | Promise<boolean>,
+    errorMessageOrError: string | Error
+  ): Pieper<T>;
+
+  assert<R extends T>(
+    predicate:
+      | ((value: T) => value is R)
+      | ((value: T) => boolean | Promise<boolean>),
+    errorMessageOrError: string | Error
+  ): Pieper<R | T> {
     const newValue = this.value.then(async (value) => {
       const isValid = await Promise.resolve(predicate(value));
 
@@ -86,14 +98,13 @@ export class Pieper<T> {
           typeof errorMessageOrError === "string"
             ? new Error(errorMessageOrError)
             : errorMessageOrError;
-
-        return error;
+        throw error;
       }
 
-      return value; // Pass value through if valid
+      return value;
     });
 
-    return new Pieper(newValue);
+    return new Pieper(newValue as Promise<R>);
   }
 
   run() {
