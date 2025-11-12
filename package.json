@@ -1,8 +1,8 @@
 {
   "name": "pieper",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "🥧 A tiny, typesafe, asynchronous pipeline for functional programming in TypeScript.",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
