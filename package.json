@@ -1,0 +1,38 @@
+{
+  "name": "pieper",
+  "version": "0.0.1",
+  "description": "🥧 A tiny, typesafe, asynchronous pipeline for functional programming in TypeScript.",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "sandbox": "tsx sandbox/index.ts",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [],
+  "author": "Maze Heart",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remvze/pieper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/remvze/pieper/issues"
+  },
+  "homepage": "https://github.com/remvze/pieper#readme",
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
