@@ -19,7 +19,11 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "pipe",
+    "pipeline",
+    "functional"
+  ],
   "author": "Maze Heart",
   "license": "MIT",
   "repository": {
