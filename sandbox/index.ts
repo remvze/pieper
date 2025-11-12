@@ -1,37 +1,55 @@
-import { Pipe } from "../src";
+import { Pieper, type SafeResult } from "../src";
 
-async function one() {
-  const pipeline = await Pipe.of(5)
-    .map((x) => x + 2)
-    .tap((x) => console.log("After addition:", x))
-    .if(
-      (x) => x > 5,
-      (x) => x * 10
-    )
-    .log("After .if:")
-    .assert((x) => x > 50, "Value is not big enought!")
-    .catch((err) => {
-      console.error("Error", err.message);
-    })
-    .run();
+async function slugify(
+  title: string | null | undefined
+): Promise<SafeResult<string>> {
+  const pipe = Pieper.from(() => {
+    if (typeof title !== "string" || title.trim().length === 0) {
+      throw new Error("Input title cannot be empty");
+    }
 
-  console.log("Final result:", pipeline);
+    return title;
+  })
+    .log("1. Original:")
+    .map((s) => s.toLowerCase())
+    .map((s) => s.normalize("NFD"))
+    .map((s) => s.replace(/[\u0300-\u036f]/g, ""))
+    .log("2. Normalized/Lowercased:")
+    .map((s) => s.replace(/[^a-z0-9]+/g, "-"))
+    .log("3. Hyphenated:")
+    .map((s) => s.replace(/^-+|-+$/g, ""))
+    .log("4. Trimmed:")
+    .ifElse(
+      (s) => s.length > 0,
+      (s) => s,
+      () => "n-a"
+    );
+
+  return pipe.runSafe();
 }
 
-async function two() {
-  const result = await Pipe.of(1)
-    .map((x) => x * 10)
-    .assert((x) => x > 20, "Value must be over 20")
-    .map((x) => `Value is ${x}`)
-    .runSafe();
+async function runExample() {
+  console.log("--- Running examples ---");
 
-  if (result.ok) {
-    console.log("Success.", result.value);
-  } else {
-    console.error("Failed.", result.error.message);
+  const testCases = [
+    "A (really) cool Title! 🚀",
+    "Føø Bår & Båz",
+    "---JUST SYMBOLS---",
+    "@#$!",
+    null,
+  ];
+
+  for (const testCase of testCases) {
+    const result = await slugify(testCase);
+
+    if (result.ok) {
+      console.log(`✅ Input: "${testCase}"  ->  Output: "${result.value}"`);
+    } else {
+      console.log(
+        `❌ Input: "${testCase}"  ->  Error: ${result.error.message}`
+      );
+    }
   }
 }
 
-one()
-  .then(() => console.log("==============="))
-  .then(two);
+runExample();

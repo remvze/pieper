@@ -4,7 +4,7 @@ export type SafeResult<T, E = any> =
 
 type MaybePromise<T> = T | Promise<T>;
 
-export class Pipe<T> {
+export class Pieper<T> {
   private readonly value: Promise<T>;
 
   private constructor(value: Promise<T>) {
@@ -12,7 +12,7 @@ export class Pipe<T> {
   }
 
   static of<T>(value: MaybePromise<T>) {
-    return new Pipe(Promise.resolve(value));
+    return new Pieper(Promise.resolve(value));
   }
 
   static from<T>(fn: () => MaybePromise<T>) {
@@ -20,11 +20,11 @@ export class Pipe<T> {
       resolve(fn());
     });
 
-    return new Pipe(promise);
+    return new Pieper(promise);
   }
 
   map<R>(fn: (value: T) => MaybePromise<R>) {
-    return new Pipe(this.value.then(fn));
+    return new Pieper(this.value.then(fn));
   }
 
   if<R>(
@@ -46,7 +46,7 @@ export class Pipe<T> {
       else return elseFn(value);
     });
 
-    return new Pipe(newValue);
+    return new Pieper(newValue);
   }
 
   tap(fn: (value: T) => MaybePromise<void>) {
@@ -56,7 +56,7 @@ export class Pipe<T> {
       return value; // Pass the original value through
     });
 
-    return new Pipe(newValue);
+    return new Pieper(newValue);
   }
 
   log(message?: string) {
@@ -67,11 +67,11 @@ export class Pipe<T> {
   }
 
   catch<R>(fn: (error: any) => MaybePromise<R>) {
-    return new Pipe(this.value.catch(fn));
+    return new Pieper(this.value.catch(fn));
   }
 
   finally(fn: () => MaybePromise<void>) {
-    return new Pipe(this.value.finally(fn));
+    return new Pieper(this.value.finally(fn));
   }
 
   assert(
@@ -93,7 +93,7 @@ export class Pipe<T> {
       return value; // Pass value through if valid
     });
 
-    return new Pipe(newValue);
+    return new Pieper(newValue);
   }
 
   run() {
@@ -112,7 +112,7 @@ export class Pipe<T> {
 
   runAndForget() {
     this.value.catch((error) => {
-      console.error("Pipe failed (runAndForget):", error);
+      console.error("Pieper failed (runAndForget):", error);
     });
   }
 }

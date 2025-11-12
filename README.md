@@ -8,6 +8,38 @@
 
 **Pieper** allows you to build complex, sequential data flows with a fluent, chainable API. It's designed to be async-native from the ground up, so you can mix synchronous and asynchronous operations seamlessly without cluttering your code with `await` at every step.
 
+```ts
+import { Pieper, type SafeResult } from "pieper";
+
+async function slugify(
+  title: string | null | undefined
+): Promise<SafeResult<string>> {
+  const pipe = Pieper.from(() => {
+    if (typeof title !== "string" || title.trim().length === 0) {
+      throw new Error("Input title cannot be empty");
+    }
+
+    return title;
+  })
+    .log("1. Original:")
+    .map((s) => s.toLowerCase())
+    .map((s) => s.normalize("NFD"))
+    .map((s) => s.replace(/[\u0300-\u036f]/g, ""))
+    .log("2. Normalized/Lowercased:")
+    .map((s) => s.replace(/[^a-z0-9]+/g, "-"))
+    .log("3. Hyphenated:")
+    .map((s) => s.replace(/^-+|-+$/g, ""))
+    .log("4. Trimmed:")
+    .ifElse(
+      (s) => s.length > 0,
+      (s) => s,
+      () => "n-a"
+    );
+
+  return pipe.runSafe();
+}
+```
+
 ### Features
 
 - **Fluent & Chainable:** A clean, easy-to-read API (`.map().tap().if()...`).
