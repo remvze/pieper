@@ -204,15 +204,13 @@ Pieper.of(db.connect())
   .finally(() => db.close());
 ```
 
-#### Terminators (Getting the Value Out)
+#### Executors (Getting the Value Out)
 
-Each step in the `Pieper` chain adds a new operation to the underlying promise. The work begins executing immediately, leveraging JavaScript's native event loop.
-
-You can only access the final resolved value (or error) by calling one of these terminal methods.
+The pipeline is lazy and does nothing until you call an executor.
 
 `.run(): Promise<T>`
 
-Returns the final promise in the chain. You can await this to get the final value. This promise **will reject** if any step in the pipe fails.
+Executes the pipeline and returns a promise for the final value. This promise **will reject** if any step fails.
 
 ```ts
 try {
@@ -226,7 +224,7 @@ try {
 
 `.runSafe(): Promise<SafeResult<T>>`
 
-Returns a promise that **never throws**. It always resolves with a `SafeResult` object:
+Executes the pipeline and **never throws**. It always resolves with a `SafeResult` object:
 
 - `{ ok: true, value: T }` on success.
 - `{ ok: false, error: any }` on failure.
